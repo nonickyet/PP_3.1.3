@@ -19,6 +19,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserService userService;
 
+    //1) @Autowired над конструктором можно явно не указывать.   Оно отваливается если убрать @autowired UnsatisfiedDependencyException
     @Autowired
     public WebSecurityConfig(SuccessUserHandler successUserHandler,@Qualifier("userServiceImpl") UserService userService) {
         this.successUserHandler = successUserHandler;

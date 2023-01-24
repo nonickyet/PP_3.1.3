@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +22,10 @@ public class UserServiceImpl implements UserService {
     UserDao userDao;
     private UserRepository userRepository;
 
+
+    //1) @Autowired над конструктором можно явно не указывать.   Оно отваливается если убрать @autowired UnsatisfiedDependencyException
     @Autowired
-    public UserServiceImpl(@Qualifier("userDaoImpl")UserDao userDao,@Qualifier("userRepository") UserRepository userRepository) {
+    public UserServiceImpl(UserDao userDao, UserRepository userRepository) {
         this.userDao = userDao;
         this.userRepository = userRepository;
     }
@@ -33,13 +36,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public org.springframework.security.core.userdetails.User loadUserByUsername(String email) throws UsernameNotFoundException {
+    public User loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = findByEmail(email);
         if (user == null) throw new UsernameNotFoundException(String.format("User '%s' not found", email));
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                mapRolesToAuthorities(user.getRoles()));
+        System.out.println(user.getAuthorities());
+        return user;
     }
 
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
